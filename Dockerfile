@@ -1,4 +1,16 @@
-FROM openjdk:17
-COPY build/libs/lab3-java-0.0.1-SNAPSHOT.jar app.jar
+FROM gradle:jdk17 AS builder
+
+WORKDIR /app
+
+COPY build.gradle settings.gradle ./
+RUN gradle build --no-daemon || return 0
+COPY . .
+RUN gradle bootJar --no-daemon
+
+FROM openjdk:17-jdk-alpine
+
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar /app/app.jar
 EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
