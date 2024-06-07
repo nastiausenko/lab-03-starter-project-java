@@ -7,7 +7,7 @@ RUN gradle build --no-daemon || return 0
 COPY . .
 RUN gradle bootJar --no-daemon
 
-FROM openjdk:17-jdk-alpine
+FROM gcr.io/distroless/java17-debian11
 
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar /app/app.jar
